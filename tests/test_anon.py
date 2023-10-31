@@ -29,7 +29,6 @@ def get_all_failed():
 
     # TODO: Investigate why these fail replacement test of anonymization
     replaced_failed = [
-        "693_J2KI.dcm",
         "JPEG-lossy.dcm",
         "JPEG2000-embedded-sequence-delimiter.dcm",
         "JPEG2000.dcm",
@@ -38,7 +37,6 @@ def get_all_failed():
         "reportsi_with_empty_number_tags.dcm",
         "SC_rgb_gdcm_KY.dcm",
         "SC_rgb_jpeg_lossy_gdcm.dcm",
-        "693_UNCI.dcm",
         "JPEG-LL.dcm",
         "JPEG2000_UNC.dcm",
         "MR2_J2KI.dcm",
@@ -115,14 +113,13 @@ def check_element_is_anonymized(orig_elem,anon_elem):
     
     if orig_elem.VR == 'SQ': #Todo handle sequence elements
         pass
-        # for sub_ds in orig_elem.value:
-        #     for sub_elem in sub_ds.elements():
-        #         check_element_is_anonymized(sub_elem, anon_elem[sub_elem.tag])
+        # Todo handle SQ tag elements
     elif orig_elem.value in emp_vals:
         pass
     elif orig_elem.value != anon_elem.value:
         if anon_elem.value in emp_vals:
-            assert anon_elem.tag in ok_if_emptied_or_replaced_tags
+            assert anon_elem.tag in ok_if_emptied_or_replaced_tags, f"Checking zero replcemnt value at {anon_elem.tag} ov={orig_elem.value} av= {anon_elem.value}"
         else:
-            assert anon_elem.tag in ok_if_replaced_tags
+            assert anon_elem.tag in ok_if_replaced_tags, f"Checking non-zero replcemnt value at {anon_elem.tag} ov= {orig_elem.value} av = {anon_elem.value}"
+
 

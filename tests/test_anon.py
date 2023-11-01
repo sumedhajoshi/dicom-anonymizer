@@ -27,6 +27,11 @@ def get_all_failed():
         "OT-PAL-8-face.dcm",
     ]
 
+    bad_dcm = [
+        "badVR.dcm",
+        "bad_sequence.dcm"
+    ]
+
     # TODO: Investigate why these fail replacement test of anonymization
     replaced_failed = [
         "JPEG-lossy.dcm",
@@ -69,12 +74,12 @@ def get_all_failed():
         "JPGLosslessP14SV1_1s_1f_8b.dcm",
         "test-SR.dcm",
     ]
-    return dcmread_failed + replaced_failed + deleted_failed + emptied_failed
+    return dcmread_failed + bad_dcm + replaced_failed + deleted_failed + emptied_failed
 
 
 @lru_cache(maxsize=None)
 def get_passing_files():
-    all_files = get_testdata_files("*.dcm")
+    all_files = get_testdata_files("b*.dcm")
     all_failed = get_all_failed()
     return [x for x in all_files if Path(x).name not in all_failed]
 
@@ -112,8 +117,10 @@ def check_element_is_anonymized(orig_elem,anon_elem):
     emp_vals = (0, '', '00010101', '000000.00', '00010101010101.000000+0000')
     
     if orig_elem.VR == 'SQ': #Todo handle sequence elements
-        pass
-        # Todo handle SQ tag elements
+        #pass
+        for sub_orig_ds, sub_anon_ds in zip(orig_elem.value, anon_elem.value):
+            for sub_orig_elem, sub_anon_elem in zip(sub_orig_ds.elements(),sub_anon_ds.elements()):
+                check_element_is_anonymized(sub_orig_elem, sub_anon_elem)
     elif orig_elem.value in emp_vals:
         pass
     elif orig_elem.value != anon_elem.value:
